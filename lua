@@ -130,7 +130,7 @@ local function OrbitAndFollowParts(player)
 -- cmds
     player.Chatted:Connect(function(msg)
         local cmd, arg = msg:match("^(%S+)%s*(.*)")
-        if cmd == ".sorbit" then
+        if cmd == ".novis" then
             stopOrbit = true
         elseif cmd == ".ospeed" then
             updateSettings(tonumber(arg) or orbitSpeed, orbitRadius)
