@@ -79,7 +79,7 @@ local function OrbitAndFollowParts(player)
         end
 
         local musicOffset = getAveragePlaybackLoudness()
-        local totalOffset = defaultOffset + (musicOffset * 0.08)
+        local totalOffset = defaultOffset + (musicOffset * 0.5)
 
         if isStationary then
             orbitCenter = stationaryPosition
@@ -155,6 +155,24 @@ local function OrbitAndFollowParts(player)
             spiralHeightMultiplier = tonumber(arg) or spiralHeightMultiplier
         elseif cmd == ".oheight" then
             orbitCenter = hrp.Position + Vector3.new(0, tonumber(arg) or 15, 0)
+        elseif cmd == ".givevis" then
+            local String = arg:lower()
+            local Found = {}
+            for _, v in pairs(game:GetService("Players"):GetPlayers()) do
+                if v.Name:lower():sub(1, #String) == String:lower() or (v.DisplayName and v.DisplayName:lower():sub(1, #String) == String:lower()) then
+                    table.insert(Found, v)
+                end
+            end
+            if #Found > 0 then
+                for _, player in ipairs(Found) do
+                    OrbitAndFollowParts(player)
+                end
+            else
+                print("Player not found.")
+            end
+        elseif cmd == ".retvis" then
+            stopOrbit = true
+            a:Disconnect()
         end
     end)
 end
