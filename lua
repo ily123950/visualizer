@@ -1,7 +1,6 @@
--- made by user
--- // VARIABLES \\
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
+
 local sensitivity = 1
 local waveFrequency = 2
 local waveAmplitude = 2
@@ -10,6 +9,26 @@ local spiralRadiusMultiplier = 0.5
 local spiralHeightMultiplier = 2
 local isStationary = false
 local stationaryPosition = Vector3.new()
+
+local LocalPlayer = game:GetService("Players").LocalPlayer
+
+local function setHiddenProperty(instance, propertyName, value)
+    local success, errorMessage = pcall(function()
+        instance[propertyName] = value
+    end)
+    if not success then
+        warn("Failed to set hidden property:", errorMessage)
+    end
+end
+
+setHiddenProperty(LocalPlayer, "SimulationRadius", 999.999)
+
+local function checkSimulationRadius()
+    local radius = LocalPlayer.SimulationRadius
+    print("Current Simulation Radius:", radius)
+end
+
+checkSimulationRadius()
 
 local function OrbitAndFollowParts(player)
     local targetCharacter = player.Character
@@ -40,7 +59,7 @@ local function OrbitAndFollowParts(player)
     local orbitSpeed = 0.02
     local orbitRadiusIncrement = 1
     local defaultOffset = 0
--- // SPIN SETUP \\ 
+
     local function updateSettings(speed, radius)
         orbitSpeed = speed
         orbitRadius = radius
@@ -49,7 +68,7 @@ local function OrbitAndFollowParts(player)
     local function updateOffset(offset)
         defaultOffset = offset
     end
--- vis
+
     local function getAveragePlaybackLoudness()
         local totalPlaybackLoudness = 0
         local numSounds = 0
@@ -66,14 +85,6 @@ local function OrbitAndFollowParts(player)
         end
     end
 
-    -- connect to heartbeat for continuous simulation radius adjustment
-    local a = RunService.Heartbeat:Connect(function()
-        setsimulationradius(999.999, 999.999)
-        local LocalPlayer = game:GetService("Players").LocalPlayer
-        LocalPlayer.MaximumSimulationRadius = math.huge
-        sethiddenproperty(LocalPlayer, "SimulationRadius", 999.999) --//Constantly set simulation to contain parts
-    end)
-
     RunService.RenderStepped:Connect(function(deltaTime)
         if stopOrbit then
             return
@@ -87,7 +98,7 @@ local function OrbitAndFollowParts(player)
         else
             orbitCenter = hrp.Position + Vector3.new(0, 21, 0)
         end
--- // Modes \\
+
         for i, part in ipairs(unanchoredParts) do
             local offset
             if mode == 1 then
@@ -127,10 +138,10 @@ local function OrbitAndFollowParts(player)
             end)
         end
     end
--- cmds
+
     player.Chatted:Connect(function(msg)
         local cmd, arg = msg:match("^(%S+)%s*(.*)")
-        if cmd == ".novis" then
+        if cmd == ".stoporbit" then
             stopOrbit = true
         elseif cmd == ".ospeed" then
             updateSettings(tonumber(arg) or orbitSpeed, orbitRadius)
