@@ -1,6 +1,7 @@
+-- made by user
+-- // VARIABLES \\
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
-
 local sensitivity = 1
 local waveFrequency = 2
 local waveAmplitude = 2
@@ -39,7 +40,7 @@ local function OrbitAndFollowParts(player)
     local orbitSpeed = 0.02
     local orbitRadiusIncrement = 1
     local defaultOffset = 0
-
+-- // SPIN SETUP \\ 
     local function updateSettings(speed, radius)
         orbitSpeed = speed
         orbitRadius = radius
@@ -48,7 +49,7 @@ local function OrbitAndFollowParts(player)
     local function updateOffset(offset)
         defaultOffset = offset
     end
-
+-- vis
     local function getAveragePlaybackLoudness()
         local totalPlaybackLoudness = 0
         local numSounds = 0
@@ -65,7 +66,7 @@ local function OrbitAndFollowParts(player)
         end
     end
 
-    -- Connect to Heartbeat for continuous simulation radius adjustment
+    -- connect to heartbeat for continuous simulation radius adjustment
     local a = RunService.Heartbeat:Connect(function()
         setsimulationradius(999.999, 999.999)
         local LocalPlayer = game:GetService("Players").LocalPlayer
@@ -86,7 +87,7 @@ local function OrbitAndFollowParts(player)
         else
             orbitCenter = hrp.Position + Vector3.new(0, 21, 0)
         end
-
+-- // Modes \\
         for i, part in ipairs(unanchoredParts) do
             local offset
             if mode == 1 then
@@ -126,10 +127,10 @@ local function OrbitAndFollowParts(player)
             end)
         end
     end
-
+-- cmds
     player.Chatted:Connect(function(msg)
         local cmd, arg = msg:match("^(%S+)%s*(.*)")
-        if cmd == ".stoporbit" then
+        if cmd == ".sorbit" then
             stopOrbit = true
         elseif cmd == ".ospeed" then
             updateSettings(tonumber(arg) or orbitSpeed, orbitRadius)
