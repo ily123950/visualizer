@@ -7,6 +7,7 @@ local waveAmplitude = 2
 local mode = 1
 local spiralRadiusMultiplier = 0.5
 local spiralHeightMultiplier = 2
+local orbitHeight = 15
 local isStationary = false
 local stationaryPosition = Vector3.new()
 
@@ -30,7 +31,7 @@ local function OrbitAndFollowParts(player)
     if numParts == 0 then return end
 
     local orbitRadius = 10
-    local orbitCenter = hrp.Position + Vector3.new(0, 15, 0)
+    local orbitCenter = hrp.Position + Vector3.new(0, orbitHeight, 0)
     local angleIncrement = 2 * math.pi / numParts
     local currentAngle = 0
     local verticalRotationSpeed = 0.05
@@ -76,7 +77,7 @@ local function OrbitAndFollowParts(player)
         if isStationary then
             orbitCenter = stationaryPosition
         else
-            orbitCenter = hrp.Position + Vector3.new(0, 15, 0)
+            orbitCenter = hrp.Position + Vector3.new(0, orbitHeight, 0)
         end
 
         for i, part in ipairs(unanchoredParts) do
@@ -131,11 +132,13 @@ local function OrbitAndFollowParts(player)
             waveFrequency = tonumber(arg) or waveFrequency
         elseif cmd == ".storb" then
             isStationary = true
-            stationaryPosition = hrp.Position + Vector3.new(0, 15, 0)
+            stationaryPosition = hrp.Position + Vector3.new(0, orbitHeight, 0)
         elseif cmd == ".backorb" then
             isStationary = false
         elseif cmd == ".spheight" then
             spiralHeightMultiplier = tonumber(arg) or spiralHeightMultiplier
+        elseif cmd == ".oheight" then
+            orbitHeight = tonumber(arg) or orbitHeight
         end
     end)
 end
