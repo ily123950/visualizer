@@ -9,7 +9,7 @@ local spiralRadiusMultiplier = 0.5
 local spiralHeightMultiplier = 2
 local isStationary = false
 local stationaryPosition = Vector3.new()
-
+print("vis v5.1.3 loaded!")
 local function OrbitAndFollowParts(player)
     local targetCharacter = player.Character
     local hrp = targetCharacter and targetCharacter:FindFirstChild("HumanoidRootPart")
