@@ -65,6 +65,14 @@ local function OrbitAndFollowParts(player)
         end
     end
 
+    -- Connect to Heartbeat for continuous simulation radius adjustment
+    local a = RunService.Heartbeat:Connect(function()
+        setsimulationradius(999.999, 999.999)
+        local LocalPlayer = game:GetService("Players").LocalPlayer
+        LocalPlayer.MaximumSimulationRadius = math.huge
+        sethiddenproperty(LocalPlayer, "SimulationRadius", 999.999) --//Constantly set simulation to contain parts
+    end)
+
     RunService.RenderStepped:Connect(function(deltaTime)
         if stopOrbit then
             return
@@ -76,7 +84,7 @@ local function OrbitAndFollowParts(player)
         if isStationary then
             orbitCenter = stationaryPosition
         else
-            orbitCenter = hrp.Position + Vector3.new(0, 15, 0)
+            orbitCenter = hrp.Position + Vector3.new(0, 21, 0)
         end
 
         for i, part in ipairs(unanchoredParts) do
@@ -152,4 +160,3 @@ local function OrbitAndFollowParts(player)
 end
 
 OrbitAndFollowParts(Players.LocalPlayer)
-
