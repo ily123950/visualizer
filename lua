@@ -137,6 +137,12 @@ local function OrbitAndFollowParts(player)
                 else
                     offset = math.sin(tick() * waveFrequency + (i - numParts / 2) * angleIncrement) * waveAmplitude
                 end
+            elseif mode == 4 then
+                if i % 2 == 0 then
+                    offset = math.sin(tick() * waveFrequency + i * angleIncrement) * waveAmplitude
+                else
+                    offset = math.sin(tick() * waveFrequency - i * angleIncrement) * waveAmplitude
+                end
             end
 
             local orbitPosition = Vector3.new(
