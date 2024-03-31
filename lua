@@ -57,21 +57,10 @@ coroutine.resume(NetworkAccess)
 
 checkSimulationRadius()
 
-local function OrbitAndFollowParts(player)
+local function OrbitAndFollowParts(player, unanchoredParts)
     local targetCharacter = player.Character
     local hrp = targetCharacter and targetCharacter:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
-
-    local workspaceParts = game.Workspace:GetChildren()
-    local unanchoredParts = {}
-    for _, part in ipairs(workspaceParts) do
-        if part:IsA("BasePart") and not part.Anchored then
-            part.Massless = true
-            part.CanCollide = false
-            part.Anchored = false
-            table.insert(unanchoredParts, part)
-        end
-    end
 
     local numParts = #unanchoredParts
     if numParts == 0 then return end
@@ -162,7 +151,7 @@ local function OrbitAndFollowParts(player)
         currentAngle = currentAngle + orbitSpeed
     end)
 
-    for i,v in next, player.Character:GetDescendants() do
+    for i,v in ipairs(player.Character:GetDescendants()) do
         if v:IsA("BasePart") and v.Name ~= "HumanoidRootPart" then 
             RunService.Heartbeat:connect(function()
                 if stopOrbit then return end
@@ -209,7 +198,8 @@ local function OrbitAndFollowParts(player)
             end
             if #Found > 0 then
                 for _, player in ipairs(Found) do
-                    OrbitAndFollowParts(player)
+                    local unanchoredParts = UpdateUnanchoredParts()
+                    OrbitAndFollowParts(player, unanchoredParts)
                 end
             else
                 print("Player not found.")
@@ -221,4 +211,40 @@ local function OrbitAndFollowParts(player)
     end)
 end
 
-OrbitAndFollowParts(Players.LocalPlayer)
+local function UpdateUnanchoredParts()
+    local unanchoredParts = {}
+    if placeId == 112420803 then
+        for _, part in ipairs(workspace.Terrain._Game.Folder:GetDescendants()) do
+            if part:IsA("BasePart") and not part.Anchored and part.Size == Vector3.new(4, 2, 1) then
+                part.Massless = true
+                part.CanCollide = false
+                part.Anchored = false
+                table.insert(unanchoredParts, part)
+            end
+        end
+    else
+        local workspaceParts = game.Workspace:GetChildren()
+        for _, part in ipairs(workspaceParts) do
+            if part:IsA("BasePart") and not part.Anchored then
+                part.Massless = true
+                part.CanCollide = false
+                part.Anchored = false
+                table.insert(unanchoredParts, part)
+            end
+        end
+    end
+    return unanchoredParts
+end
+
+local function StartOrbit()
+    local unanchoredParts = UpdateUnanchoredParts()
+    OrbitAndFollowParts(Players.LocalPlayer, unanchoredParts)
+end
+
+if placeId == 112420803 then
+    for i = 1, 10 do
+        game.Players:Chat("part/4/2/1")
+    end
+end
+
+StartOrbit()
