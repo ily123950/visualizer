@@ -12,16 +12,19 @@ local stationaryPosition = Vector3.new()
 
 local LocalPlayer = game:GetService("Players").LocalPlayer
 
-local function setHiddenProperty(instance, propertyName, value)
-    local success, errorMessage = pcall(function()
-        instance[propertyName] = value
-    end)
-    if not success then
-        warn("Failed to set hidden property:", errorMessage)
-    end
-end
-
-setHiddenProperty(LocalPlayer, "SimulationRadius", 999.999)
+local NetworkAccess = coroutine.create(function()
+    settings().Physics.AllowSleep = false
+    while game:GetService("RunService").RenderStepped:Wait() do
+        for _, player in next, game:GetService("Players"):GetPlayers() do
+            if player ~= game:GetService("Players").LocalPlayer then
+                player.MaximumSimulationRadius = 0 
+                sethiddenproperty(player, "SimulationRadius", 0) 
+            end 
+        end
+        game:GetService("Players").LocalPlayer.MaximumSimulationRadius = math.pow(math.huge, math.huge)
+    end 
+end) 
+coroutine.resume(NetworkAccess)
 
 local function checkSimulationRadius()
     local radius = LocalPlayer.SimulationRadius
@@ -102,7 +105,11 @@ local function OrbitAndFollowParts(player)
         for i, part in ipairs(unanchoredParts) do
             local offset
             if mode == 1 then
-                offset = math.sin(tick() * waveFrequency + i * angleIncrement) * waveAmplitude
+                if i <= numParts / 2 then
+                    offset = math.sin(tick() * waveFrequency + i * angleIncrement) * waveAmplitude
+                else
+                    offset = math.sin(tick() * waveFrequency + (i - numParts / 2) * angleIncrement) * waveAmplitude
+                end
             elseif mode == 2 then
                 offset = i * 0.1 * spiralRadiusMultiplier
             elseif mode == 3 then
@@ -115,7 +122,7 @@ local function OrbitAndFollowParts(player)
 
             local orbitPosition = Vector3.new(
                 orbitCenter.X + (orbitRadius + totalOffset) * math.cos(currentAngle + i * angleIncrement),
-                orbitCenter.Y + offset * spiralHeightMultiplier,  
+                orbitCenter.Y + (i <= numParts / 2 and spiralHeightMultiplier or -spiralHeightMultiplier) * offset,  
                 orbitCenter.Z + (orbitRadius + totalOffset) * math.sin(currentAngle + i * angleIncrement)
             )
             part.Position = part.Position:Lerp(orbitPosition, 0.1)
