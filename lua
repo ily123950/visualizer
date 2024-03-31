@@ -117,7 +117,7 @@ local function OrbitAndFollowParts(player)
         end
 
         local musicOffset = getAveragePlaybackLoudness()
-        local totalOffset = defaultOffset + (musicOffset * 0.5)
+        local totalOffset = defaultOffset + (musicOffset * 0.09)
 
         if isStationary then
             orbitCenter = stationaryPosition
