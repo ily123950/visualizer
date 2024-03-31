@@ -12,24 +12,48 @@ local stationaryPosition = Vector3.new()
 
 local LocalPlayer = game:GetService("Players").LocalPlayer
 
-local NetworkAccess = coroutine.create(function()
-    settings().Physics.AllowSleep = false
-    while game:GetService("RunService").RenderStepped:Wait() do
-        for _, player in next, game:GetService("Players"):GetPlayers() do
-            if player ~= game:GetService("Players").LocalPlayer then
-                player.MaximumSimulationRadius = 0 
-                sethiddenproperty(player, "SimulationRadius", 0) 
-            end 
-        end
-        game:GetService("Players").LocalPlayer.MaximumSimulationRadius = math.pow(math.huge, math.huge)
-    end 
-end) 
-coroutine.resume(NetworkAccess)
+local function sethiddenproperty(instance, propertyName, value)
+    local success, errorMessage = pcall(function()
+        instance[propertyName] = value
+    end)
+    if not success then
+        warn("Failed to set hidden property:", errorMessage)
+    end
+end
+
+sethiddenproperty(LocalPlayer, "SimulationRadius", 9999999)
+for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+    if player ~= LocalPlayer then
+        sethiddenproperty(player, "SimulationRadius", 0)
+    end
+end
 
 local function checkSimulationRadius()
+    local LocalPlayer = game:GetService("Players").LocalPlayer
     local radius = LocalPlayer.SimulationRadius
-    print("Current Simulation Radius:", radius)
+    print("Local Player's Current Simulation Radius:", radius)
+    
+    for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+        if player ~= LocalPlayer then
+            print("Other Player's Current Simulation Radius:", player.SimulationRadius)
+        end
+    end
 end
+
+local NetworkAccess = coroutine.create(function()
+    settings().Physics.AllowSleep = false
+    while true do
+        sethiddenproperty(LocalPlayer, "SimulationRadius", 9999999)
+        for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+            if player ~= LocalPlayer then
+                sethiddenproperty(player, "SimulationRadius", 0)
+            end
+        end
+        wait(35) -- ajajdrjjdkdkeek
+    end
+end)
+
+coroutine.resume(NetworkAccess)
 
 checkSimulationRadius()
 
@@ -60,7 +84,6 @@ local function OrbitAndFollowParts(player)
 
     local stopOrbit = false
     local orbitSpeed = 0.02
-    local orbitRadiusIncrement = 1
     local defaultOffset = 0
 
     local function updateSettings(speed, radius)
@@ -105,11 +128,7 @@ local function OrbitAndFollowParts(player)
         for i, part in ipairs(unanchoredParts) do
             local offset
             if mode == 1 then
-                if i <= numParts / 2 then
-                    offset = math.sin(tick() * waveFrequency + i * angleIncrement) * waveAmplitude
-                else
-                    offset = math.sin(tick() * waveFrequency + (i - numParts / 2) * angleIncrement) * waveAmplitude
-                end
+                offset = math.sin(tick() * waveFrequency + i * angleIncrement) * waveAmplitude
             elseif mode == 2 then
                 offset = i * 0.1 * spiralRadiusMultiplier
             elseif mode == 3 then
@@ -122,7 +141,7 @@ local function OrbitAndFollowParts(player)
 
             local orbitPosition = Vector3.new(
                 orbitCenter.X + (orbitRadius + totalOffset) * math.cos(currentAngle + i * angleIncrement),
-                orbitCenter.Y + (i <= numParts / 2 and spiralHeightMultiplier or -spiralHeightMultiplier) * offset,  
+                orbitCenter.Y + offset * spiralHeightMultiplier,  
                 orbitCenter.Z + (orbitRadius + totalOffset) * math.sin(currentAngle + i * angleIncrement)
             )
             part.Position = part.Position:Lerp(orbitPosition, 0.1)
