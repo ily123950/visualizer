@@ -43,13 +43,13 @@ end
 local NetworkAccess = coroutine.create(function()
     settings().Physics.AllowSleep = false
     while true do
-        sethiddenproperty(LocalPlayer, "SimulationRadius", 9999999)
+        sethiddenproperty(LocalPlayer, "SimulationRadius", math.huge)
         for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
             if player ~= LocalPlayer then
                 sethiddenproperty(player, "SimulationRadius", 0)
             end
         end
-        wait(35) -- ajajdrjjdkdkeek
+        wait() -- ajajdrjjdkdkeek
     end
 end)
 
