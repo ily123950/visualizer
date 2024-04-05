@@ -133,6 +133,15 @@ local function OrbitAndFollowParts(player, unanchoredParts)
                     offset = math.sin(tick() * waveFrequency - i * angleIncrement) * waveAmplitude
                 end
             end
+            elseif newMode == 5 then
+        RunService.RenderStepped:Connect(function(deltaTime)
+            for i, part in ipairs(unanchoredParts) do
+                local scale = math.sin(tick() * 2 + i * 0.5) * 0.5 + 1 -- Изменение масштаба в диапазоне от 0.5 до 1.5
+                local heightOffset = math.sin(tick() * 1.5 + i * 0.2) * 5 -- Изменение высоты по оси Y
+                part.Size = Vector3.new(4 * scale, 2 * scale, 1 * scale)
+                part.Position = Vector3.new(part.Position.X, hrp.Position.Y + 15 + heightOffset, part.Position.Z)
+            end
+        end)
 
             local orbitPosition = Vector3.new(
                 orbitCenter.X + (orbitRadius + totalOffset) * math.cos(currentAngle + i * angleIncrement),
