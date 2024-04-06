@@ -9,6 +9,8 @@ local spiralRadiusMultiplier = 0.5
 local spiralHeightMultiplier = 2
 local isStationary = false
 local stationaryPosition = Vector3.new()
+local tiltStrength = 0.2  -- Default tilt strength
+local waveEnabled = true  -- Variable to track whether wave effect is enabled or not
 
 local LocalPlayer = game:GetService("Players").LocalPlayer
 
@@ -56,6 +58,17 @@ end)
 coroutine.resume(NetworkAccess)
 
 checkSimulationRadius()
+
+local rotatingEnabled = true  -- Variable to track whether rotation is enabled or not
+
+local function RotateParts(player, unanchoredParts, currentAngle, angleIncrement, verticalRotationSpeed, tiltStrength)
+    for i, part in ipairs(unanchoredParts) do
+        local horizontalRotation = CFrame.Angles(0, currentAngle + i * angleIncrement, 0)
+        local verticalRotation = CFrame.Angles(0, 0, math.sin(tick()) * verticalRotationSpeed)
+        local tilt = CFrame.Angles(math.sin(tick()) * tiltStrength, 0, 0)  -- Apply tilt
+        part.CFrame = CFrame.new(part.Position) * tilt * horizontalRotation * verticalRotation
+    end
+end
 
 local function OrbitAndFollowParts(player, unanchoredParts)
     local targetCharacter = player.Character
@@ -106,7 +119,7 @@ local function OrbitAndFollowParts(player, unanchoredParts)
         end
 
         local musicOffset = getAveragePlaybackLoudness()
-        local totalOffset = defaultOffset + (musicOffset * 0.09)
+        local totalOffset = defaultOffset + (musicOffset * 0.09) -- Adjust the multiplier to control the tilt intensity
 
         if isStationary then
             orbitCenter = stationaryPosition
@@ -116,22 +129,28 @@ local function OrbitAndFollowParts(player, unanchoredParts)
 
         for i, part in ipairs(unanchoredParts) do
             local offset
-            if mode == 1 then
-                offset = math.sin(tick() * waveFrequency + i * angleIncrement) * waveAmplitude
-            elseif mode == 2 then
-                offset = i * 0.1 * spiralRadiusMultiplier
-            elseif mode == 3 then
-                if i <= numParts / 2 then
+            if waveEnabled then
+                if mode == 1 then
                     offset = math.sin(tick() * waveFrequency + i * angleIncrement) * waveAmplitude
-                else
-                    offset = math.sin(tick() * waveFrequency + (i - numParts / 2) * angleIncrement) * waveAmplitude
+                elseif mode == 2 then
+                    offset = i * 0.1 * spiralRadiusMultiplier
+                elseif mode == 3 then
+                    if i <= numParts / 2 then
+                        offset = math.sin(tick() * waveFrequency + i * angleIncrement) * waveAmplitude
+                    else
+                        offset = math.sin(tick() * waveFrequency + (i - numParts / 2) * angleIncrement) * waveAmplitude
+                    end
+                elseif mode == 4 then
+                    if i % 2 == 0 then
+                        offset = math.sin(tick() * waveFrequency + i * angleIncrement) * waveAmplitude
+                    else
+                        offset = math.sin(tick() * waveFrequency - i * angleIncrement) * waveAmplitude
+                    end
+                elseif mode == 5 then
+                    offset = math.sin(tick() * waveFrequency + i * angleIncrement) * waveAmplitude * math.sin(i * angleIncrement)
                 end
-            elseif mode == 4 then
-                if i % 2 == 0 then
-                    offset = math.sin(tick() * waveFrequency + i * angleIncrement) * waveAmplitude
-                else
-                    offset = math.sin(tick() * waveFrequency - i * angleIncrement) * waveAmplitude
-                end
+            else
+                offset = 0  -- No wave effect
             end
 
             local orbitPosition = Vector3.new(
@@ -143,9 +162,11 @@ local function OrbitAndFollowParts(player, unanchoredParts)
             local direction = (orbitPosition - part.Position).unit
             part.Velocity = direction * orbitSpeed * (orbitRadius + totalOffset)
 
-            local horizontalRotation = CFrame.Angles(0, currentAngle + i * angleIncrement, 0)
-            local verticalRotation = CFrame.Angles(0, 0, math.sin(tick()) * verticalRotationSpeed)
-            part.CFrame = CFrame.new(part.Position) * horizontalRotation * verticalRotation
+            if rotatingEnabled then
+                RotateParts(player, unanchoredParts, currentAngle, angleIncrement, verticalRotationSpeed, tiltStrength)
+            else
+                part.CFrame = CFrame.new(part.Position, hrp.Position)
+            end
         end
         
         currentAngle = currentAngle + orbitSpeed
@@ -207,6 +228,16 @@ local function OrbitAndFollowParts(player, unanchoredParts)
         elseif cmd == ".retvis" then
             stopOrbit = true
             a:Disconnect()
+        elseif cmd == ".norot" then
+            rotatingEnabled = false
+        elseif cmd == ".rot" then
+            rotatingEnabled = true
+        elseif cmd == ".tilt" then
+            tiltStrength = tonumber(arg) or tiltStrength
+        elseif cmd == ".nowave" then
+            waveEnabled = false
+        elseif cmd == ".wave" then
+            waveEnabled = true
         end
     end)
 end
