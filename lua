@@ -159,8 +159,9 @@ local function OrbitAndFollowParts(player, unanchoredParts)
                 orbitCenter.Z + (orbitRadius + totalOffset) * math.sin(currentAngle + i * angleIncrement)
             )
             part.Position = part.Position:Lerp(orbitPosition, 0.1)
+
             local direction = (orbitPosition - part.Position).unit
-            part.Velocity = direction * orbitSpeed * (orbitRadius + totalOffset)
+            part.Velocity = direction * orbitSpeed * (orbitRadius + totalOffset) * 10  -- Adjust the multiplier to control velocity
 
             if rotatingEnabled then
                 RotateParts(player, unanchoredParts, currentAngle, angleIncrement, verticalRotationSpeed, tiltStrength)
@@ -176,7 +177,7 @@ local function OrbitAndFollowParts(player, unanchoredParts)
         if v:IsA("BasePart") and v.Name ~= "HumanoidRootPart" then 
             RunService.Heartbeat:connect(function()
                 if stopOrbit then return end
-                v.Velocity = Vector3.new(34, 54, 0)
+                v.Velocity = Vector3.new(0, 0, 0)  -- Stop shaking by setting velocity to zero
             end)
         end
     end
@@ -279,3 +280,21 @@ if placeId == 112420803 then
 end
 
 StartOrbit()
+
+-- Function to check if music is playing
+local function isMusicPlaying()
+    for _, obj in ipairs(workspace:GetChildren()) do
+        if obj:IsA("Sound") and obj.Playing then
+            return true
+        end
+    end
+    return false
+end
+
+-- Monitor music playing status and adjust rotatingEnabled and tiltStrength accordingly
+while true do
+    local musicPlaying = isMusicPlaying()
+    rotatingEnabled = not musicPlaying  -- Disable rotation when music is playing
+    tiltStrength = musicPlaying and 0.2 or 0  -- Disable tilt when music is not playing
+    wait(0.5)  -- Check every second
+end
