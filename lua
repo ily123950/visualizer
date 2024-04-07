@@ -1,3 +1,6 @@
+-- gui library made by me
+loadstring(game:HttpGet("https://raw.githubusercontent.com/ily123950/guiAPI/main/Api"))()
+-- main
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 
@@ -33,7 +36,8 @@ end
 local function checkSimulationRadius()
     local LocalPlayer = game:GetService("Players").LocalPlayer
     local radius = LocalPlayer.SimulationRadius
-    print("Local Player's Current Simulation Radius:", radius)
+    Notify("Vis", "Local Player's Current Simulation Radius: " .. tostring(radius), 5)
+
     
     for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
         if player ~= LocalPlayer then
