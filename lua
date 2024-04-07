@@ -185,66 +185,85 @@ local function OrbitAndFollowParts(player, unanchoredParts)
             end)
         end
     end
-
     player.Chatted:Connect(function(msg)
-        local cmd, arg = msg:match("^(%S+)%s*(.*)")
-        if cmd == ".stoporbit" then
-            stopOrbit = true
-        elseif cmd == ".ospeed" then
-            updateSettings(tonumber(arg) or orbitSpeed, orbitRadius)
-        elseif cmd == ".oradius" then
-            updateSettings(orbitSpeed, tonumber(arg) or orbitRadius)
-        elseif cmd == ".offset" then
-            updateOffset(tonumber(arg) or defaultOffset)
-        elseif cmd == ".mode" then
-            mode = tonumber(arg) or mode
-        elseif cmd == ".str" then
-            sensitivity = tonumber(arg) or sensitivity
-            waveFrequency = sensitivity * 0.1
-        elseif cmd == ".waveamp" then
-            waveAmplitude = tonumber(arg) or waveAmplitude
-        elseif cmd == ".wavefreq" then
-            waveFrequency = tonumber(arg) or waveFrequency
-        elseif cmd == ".storb" then
-            isStationary = true
-            stationaryPosition = hrp.Position + Vector3.new(0, 15, 0)
-        elseif cmd == ".backorb" then
-            isStationary = false
-        elseif cmd == ".spheight" then
-            spiralHeightMultiplier = tonumber(arg) or spiralHeightMultiplier
-        elseif cmd == ".oheight" then
-            orbitCenter = hrp.Position + Vector3.new(0, tonumber(arg) or 15, 0)
-        elseif cmd == ".givevis" then
-            local String = arg:lower()
-            local Found = {}
-            for _, v in pairs(game:GetService("Players"):GetPlayers()) do
-                if v.Name:lower():sub(1, #String) == String:lower() or (v.DisplayName and v.DisplayName:lower():sub(1, #String) == String:lower()) then
-                    table.insert(Found, v)
-                end
+    local cmd, arg = msg:match("^(%S+)%s*(.*)")
+    if cmd == ".stoporbit" then
+        stopOrbit = true
+        Notify("Info", "Stopping orbit", 3)
+    elseif cmd == ".ospeed" then
+        updateSettings(tonumber(arg) or orbitSpeed, orbitRadius)
+        Notify("Info", "Orbit speed: " .. (tonumber(arg) or orbitSpeed), 3)
+    elseif cmd == ".oradius" then
+        updateSettings(orbitSpeed, tonumber(arg) or orbitRadius)
+        Notify("Info", "Orbit radius: " .. (tonumber(arg) or orbitRadius), 3)
+    elseif cmd == ".offset" then
+        updateOffset(tonumber(arg) or defaultOffset)
+        Notify("Info", "Offset: " .. (tonumber(arg) or defaultOffset), 3)
+    elseif cmd == ".mode" then
+        mode = tonumber(arg) or mode
+        Notify("Info", "Mode: " .. (tonumber(arg) or mode), 3)
+    elseif cmd == ".str" then
+        sensitivity = tonumber(arg) or sensitivity
+        waveFrequency = sensitivity * 0.1
+        Notify("Info", "Sensitivity: " .. (tonumber(arg) or sensitivity), 3)
+    elseif cmd == ".waveamp" then
+        waveAmplitude = tonumber(arg) or waveAmplitude
+        Notify("Info", "Wave amplitude: " .. (tonumber(arg) or waveAmplitude), 3)
+    elseif cmd == ".wavefreq" then
+        waveFrequency = tonumber(arg) or waveFrequency
+        Notify("Info", "Wave frequency: " .. (tonumber(arg) or waveFrequency), 3)
+    elseif cmd == ".storb" then
+        isStationary = true
+        stationaryPosition = hrp.Position + Vector3.new(0, 15, 0)
+        Notify("Info", "Stationary mode enabled", 3)
+    elseif cmd == ".backorb" then
+        isStationary = false
+        Notify("Info", "Back to orbit mode", 3)
+    elseif cmd == ".spheight" then
+        spiralHeightMultiplier = tonumber(arg) or spiralHeightMultiplier
+        Notify("Info", "Spiral height multiplier: " .. (tonumber(arg) or spiralHeightMultiplier), 3)
+    elseif cmd == ".oheight" then
+        orbitCenter = hrp.Position + Vector3.new(0, tonumber(arg) or 15, 0)
+        Notify("Info", "Orbit height: " .. (tonumber(arg) or orbitCenter.y), 3)
+    elseif cmd == ".givevis" then
+        local String = arg:lower()
+        local Found = {}
+        for _, v in pairs(game:GetService("Players"):GetPlayers()) do
+            if v.Name:lower():sub(1, #String) == String:lower() or (v.DisplayName and v.DisplayName:lower():sub(1, #String) == String:lower()) then
+                table.insert(Found, v)
             end
-            if #Found > 0 then
-                for _, player in ipairs(Found) do
-                    local unanchoredParts = UpdateUnanchoredParts()
-                    OrbitAndFollowParts(player, unanchoredParts)
-                end
-            else
-                print("Player not found.")
-            end
-        elseif cmd == ".retvis" then
-            stopOrbit = true
-            a:Disconnect()
-        elseif cmd == ".norot" then
-            rotatingEnabled = false
-        elseif cmd == ".rot" then
-            rotatingEnabled = true
-        elseif cmd == ".tilt" then
-            tiltStrength = tonumber(arg) or tiltStrength
-        elseif cmd == ".nowave" then
-            waveEnabled = false
-        elseif cmd == ".wave" then
-            waveEnabled = true
         end
-    end)
+        if #Found > 0 then
+            for _, player in ipairs(Found) do
+                local unanchoredParts = UpdateUnanchoredParts()
+                OrbitAndFollowParts(player, unanchoredParts)
+            end
+            Notify("Info", "Visibility granted to player(s)", 3)
+        else
+            Notify("Error", "Player(s) not found", 3)
+        end
+    elseif cmd == ".retvis" then
+        stopOrbit = true
+        a:Disconnect()
+        Notify("Info", "Returning visibility", 3)
+    elseif cmd == ".norot" then
+        rotatingEnabled = false
+        Notify("Info", "Rotation disabled", 3)
+    elseif cmd == ".rot" then
+        rotatingEnabled = true
+        Notify("Info", "Rotation enabled", 3)
+    elseif cmd == ".tilt" then
+        tiltStrength = tonumber(arg) or tiltStrength
+        Notify("Info", "Tilt strength updated: " .. (tonumber(arg) or tiltStrength), 3)
+    elseif cmd == ".nowave" then
+        waveEnabled = false
+        Notify("Info", "Wave effect disabled", 3)
+    elseif cmd == ".wave" then
+        waveEnabled = true
+        Notify("Info", "Wave effect enabled", 3)
+    end
+end)
+    
 end
 
 local function UpdateUnanchoredParts()
