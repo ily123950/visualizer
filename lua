@@ -1,3 +1,5 @@
+-- hi
+
 -- gui library made by me
 loadstring(game:HttpGet("https://raw.githubusercontent.com/ily123950/guiAPI/main/Api"))()
 -- main
