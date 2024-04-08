@@ -1,4 +1,5 @@
--- hi
+-- PART SPAWNER
+loadstring(game:HttpGet("https://raw.githubusercontent.com/ily123950/PartSpawner/main/lua"))();
 
 -- gui library made by me
 loadstring(game:HttpGet("https://raw.githubusercontent.com/ily123950/guiAPI/main/Api"))()
@@ -282,7 +283,7 @@ local function UpdateUnanchoredParts()
     else
         local workspaceParts = game.Workspace:GetChildren()
         for _, part in ipairs(workspaceParts) do
-            if part:IsA("BasePart") and not part.Anchored then
+            if part:IsA("BasePart") and not part.Anchored and part.Color == Color3.new(1, 0, 0) then
                 part.Massless = true
                 part.CanCollide = false
                 part.Anchored = false
