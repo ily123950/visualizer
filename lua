@@ -1,5 +1,3 @@
-loadstring(game:HttpGet("https://raw.githubusercontent.com/ily123950/f3x-giver/main/lua"))();
-wait(0.1)
 -- PART SPAWNER
 loadstring(game:HttpGet("https://raw.githubusercontent.com/ily123950/PartSpawner/main/lua"))();
 -- gui library made by me
