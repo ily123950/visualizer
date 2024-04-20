@@ -1,4 +1,5 @@
--- PART SPAWNER
+-- script is discontinued, you can use it anyways, but im tired, bye.
+-- maybe in the future script will receive one last update, but we will see
 loadstring(game:HttpGet("https://raw.githubusercontent.com/ily123950/PartSpawner/main/lua"))();
 -- gui library made by me
 loadstring(game:HttpGet("https://raw.githubusercontent.com/ily123950/guiAPI/main/Api"))()
