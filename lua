@@ -1,3 +1,4 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/ily123950/Finder/main/Music"))();
 -- script is discontinued, you can use it anyways, but im tired, bye.
 -- maybe in the future script will receive one last update, but we will see
 loadstring(game:HttpGet("https://raw.githubusercontent.com/ily123950/PartSpawner/main/lua"))();
